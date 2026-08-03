@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#0b0b0c;color:#f2f0ee;font-family:'Inter',sans-serif;}
+  a{color:#ff4d5e;}
+  a:hover{color:#ff7580;}
+  ::-webkit-scrollbar{height:8px;width:8px;}
+  ::-webkit-scrollbar-thumb{background:#c8102e;border-radius:4px;}
+</style>
+</helmet>
+<div style="min-height:100vh;background:radial-gradient(ellipse 900px 500px at 50% -10%, rgba(200,16,46,0.25), transparent 60%), #0b0b0c;">
+
+  <div style="position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:rgba(10,10,11,0.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.08);">
+    <a href="./index.html" style="display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;">
+      <img src="./assets/badge.png" alt="Rochester United F.C. badge" style="width:40px;height:40px;object-fit:contain" />
+      <span style="font-family:'Oswald',sans-serif;font-weight:600;font-size:18px;letter-spacing:0.5px;text-transform:uppercase;color:#f2f0ee;">Rochester United <span style="color:#ff4d5e">F.C.</span></span>
+    </a>
+    <div style="display:flex;align-items:center;gap:24px;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;">
+      <a href="./index.html" style="color:rgba(242,240,238,0.55);text-decoration:none;">Stats</a>
+      <span style="color:#ff4d5e;">Fixtures</span>
+      <span style="color:rgba(242,240,238,0.5);letter-spacing:1.5px;">2026/27 Season</span>
+    </div>
+  </div>
+
+  <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+    <div style="max-width:900px;margin:0 auto;padding:56px 40px 80px;">
+
+      <div style="text-align:center;margin-bottom:48px;">
+        <img src="./assets/badge.png" alt="Rochester United F.C. badge" style="width:100px;height:100px;object-fit:contain;margin-bottom:20px;filter:drop-shadow(0 8px 24px rgba(200,16,46,0.35));" />
+        <h1 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:44px;letter-spacing:1px;text-transform:uppercase;margin:0 0 8px;">Fixtures &amp; Results</h1>
+        <p style="font-size:16px;color:rgba(242,240,238,0.55);margin:0;">The 2026/27 season, match by match</p>
+        <sc-if value="{{ hasDataStatus }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:12px;letter-spacing:0.5px;color:#e8c547;margin:10px 0 0;">{{ dataStatus }}</p>
+        </sc-if>
+      </div>
+
+      <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:18px;letter-spacing:1px;text-transform:uppercase;color:#ff4d5e;margin:0 0 16px;">Upcoming Fixtures</h2>
+      <sc-if value="{{ hasUpcoming }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:48px;">
+          <sc-for list="{{ upcoming }}" as="f" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;background:#161617;border:1px solid rgba(255,255,255,0.08);border-left:3px solid #c8102e;border-radius:10px;padding:16px 20px;flex-wrap:wrap;">
+              <div style="min-width:110px;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.5px;text-transform:uppercase;color:rgba(242,240,238,0.5);">{{ f.dateLabel }}</div>
+              <div style="flex:1;min-width:180px;">
+                <div style="font-weight:600;font-size:16px;">{{ f.venueLabel }} {{ f.opponent }}</div>
+                <div style="font-size:13px;color:rgba(242,240,238,0.45);">{{ f.competition }}</div>
+              </div>
+              <div style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(242,240,238,0.7);">{{ f.kickoff }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasNoUpcoming }}" hint-placeholder-val="{{ false }}">
+        <p style="color:rgba(242,240,238,0.45);font-size:14px;margin:0 0 48px;">No upcoming fixtures scheduled.</p>
+      </sc-if>
+
+      <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:18px;letter-spacing:1px;text-transform:uppercase;color:#ff4d5e;margin:0 0 16px;">Results</h2>
+      <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ results }}" as="f" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;background:#161617;border:1px solid rgba(255,255,255,0.08);border-left:3px solid {{ f.resultColor }};border-radius:10px;padding:16px 20px;flex-wrap:wrap;cursor:pointer;" style-hover="background:rgba(200,16,46,0.08)" onClick="{{ () => openMatch(f.date) }}">
+              <div style="min-width:110px;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.5px;text-transform:uppercase;color:rgba(242,240,238,0.5);">{{ f.dateLabel }}</div>
+              <div style="flex:1;min-width:180px;">
+                <div style="font-weight:600;font-size:16px;">{{ f.venueLabel }} {{ f.opponent }}</div>
+                <div style="font-size:13px;color:rgba(242,240,238,0.45);">{{ f.competition }}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:20px;font-variant-numeric:tabular-nums;">{{ f.scoreLabel }}</div>
+                <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;background:{{ f.resultColor }};color:#0b0b0c;">{{ f.result }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasNoResults }}" hint-placeholder-val="{{ false }}">
+        <p style="color:rgba(242,240,238,0.45);font-size:14px;margin:0;">No results yet this season.</p>
+      </sc-if>
+
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isMatch }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:700px;margin:0 auto;padding:48px 40px 80px;">
+      <div style="margin-bottom:32px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.5px;text-transform:uppercase;color:#ff4d5e;" onClick="{{ backToList }}">&larr; All Fixtures</div>
+
+      <div style="margin-bottom:40px;">
+        <div style="font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:rgba(242,240,238,0.5);margin-bottom:8px;">{{ match.dateLabel }} &middot; {{ match.competition }}</div>
+        <h1 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:34px;text-transform:uppercase;margin:0 0 16px;">{{ match.venueLabel }} {{ match.opponent }}</h1>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:36px;font-variant-numeric:tabular-nums;">{{ match.scoreLabel }}</div>
+          <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-weight:700;font-size:14px;background:{{ match.resultColor }};color:#0b0b0c;">{{ match.result }}</div>
+        </div>
+      </div>
+
+      <sc-if value="{{ hasMatchDetail }}" hint-placeholder-val="{{ false }}">
+
+        <sc-if value="{{ hasGoals }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:16px;letter-spacing:1px;text-transform:uppercase;color:#ff4d5e;margin:0 0 12px;">Goals</h2>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:32px;">
+            <sc-for list="{{ goals }}" as="g" hint-placeholder-count="2">
+              <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 16px;font-size:15px;">
+                <span style="font-family:'Oswald',sans-serif;color:rgba(242,240,238,0.5);margin-right:8px;">{{ g.minute }}&#39;</span>
+                <span style="font-weight:600;">{{ g.player }}</span>
+                <sc-if value="{{ g.hasAssist }}" hint-placeholder-val="{{ false }}">
+                  <span style="color:rgba(242,240,238,0.45);"> (assist: {{ g.assistBy }})</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:16px;letter-spacing:1px;text-transform:uppercase;color:#ff4d5e;margin:0 0 12px;">Starting XI</h2>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:32px;">
+          <sc-for list="{{ starters }}" as="p" hint-placeholder-count="11">
+            <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;font-size:14px;">{{ p.player }}</div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ hasSubs }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:16px;letter-spacing:1px;text-transform:uppercase;color:#ff4d5e;margin:0 0 12px;">Substitutes</h2>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:32px;">
+            <sc-for list="{{ subs }}" as="s" hint-placeholder-count="3">
+              <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 16px;font-size:15px;">
+                <span style="font-family:'Oswald',sans-serif;color:rgba(242,240,238,0.5);margin-right:8px;">{{ s.minute }}&#39;</span>
+                <span style="font-weight:600;">{{ s.player }}</span>
+                <span style="color:rgba(242,240,238,0.45);"> on for {{ s.subFor }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ hasYellows }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:16px;letter-spacing:1px;text-transform:uppercase;color:#e8c547;margin:0 0 12px;">Yellow Cards</h2>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <sc-for list="{{ yellows }}" as="y" hint-placeholder-count="2">
+              <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 16px;font-size:15px;">
+                <span style="font-family:'Oswald',sans-serif;color:rgba(242,240,238,0.5);margin-right:8px;">{{ y.minute }}&#39;</span>
+                <span style="font-weight:600;">{{ y.player }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+      </sc-if>
+      <sc-if value="{{ hasNoMatchDetail }}" hint-placeholder-val="{{ true }}">
+        <p style="color:rgba(242,240,238,0.45);font-size:14px;">Match details haven&#39;t been added for this game yet.</p>
+      </sc-if>
+
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+// Live fixtures are pulled from a published Google Sheet (File > Share > Publish to web > CSV).
+// Paste that CSV link here. Until you do, the page falls back to the data below.
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQbLY3frjMJFQDnmdoT-31BkXh60zW1OAw-7pTk5gJ66NmbBzhjzCX2igVj3MXLLUI9dREXHQ_32nnZ/pub?output=csv';
+
+// A separate spreadsheet holds match detail (lineup, subs, goals, cards) — one row
+// per event, joined to a fixture by its exact "date" value (YYYY-MM-DD).
+// Paste that sheet's published CSV link here. Until you do, matches just show
+// "Match details haven't been added yet" when clicked.
+const MATCH_EVENTS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkxMihhf5gtl6GHl0ed2lNXjAYzsGjce_KfdzovJtJB6XPQczdQi2hVuEE7ggzMmDKMky4xEATyLOB/pub?output=csv';
+
+// Match Events sheet columns (exact header names, one row per event):
+// date, type, player, minute, assistBy, subFor
+// - date: must exactly match the fixture's date (YYYY-MM-DD)
+// - type: one of Start | Sub | Goal | Yellow
+//     Start  — a player in the starting XI (minute/assistBy/subFor left blank)
+//     Sub    — a player who came on; minute = when, subFor = who they replaced
+//     Goal   — minute = when scored, assistBy = who assisted (blank if none)
+//     Yellow — minute = when booked
+function parseCsv(text) {
+  const rows = text.trim().split(/\r?\n/).map(line => {
+    const cells = [];
+    let cur = '', inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (inQuotes) {
+        if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else inQuotes = false; }
+        else cur += c;
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ',') { cells.push(cur); cur = ''; }
+        else cur += c;
+      }
+    }
+    cells.push(cur);
+    return cells;
+  });
+  const header = rows[0].map(h => h.trim());
+  return rows.slice(1)
+    .filter(r => r.some(c => c.trim() !== ''))
+    .map(r => {
+      const obj = {};
+      header.forEach((h, i) => { obj[h] = (r[i] ?? '').trim(); });
+      return obj;
+    });
+}
+
+function parseFixturesCsv(text) {
+  return parseCsv(text).map(obj => ({
+    date: obj.date,
+    opponent: obj.opponent,
+    homeAway: (obj.homeAway || '').trim().toUpperCase(),
+    competition: obj.competition,
+    kickoff: obj.kickoff,
+    homeScore: obj.homeScore,
+    awayScore: obj.awayScore
+  }));
+}
+
+function parseMatchEventsCsv(text) {
+  return parseCsv(text).map(obj => ({
+    date: obj.date,
+    type: (obj.type || '').trim(),
+    player: obj.player,
+    minute: obj.minute,
+    assistBy: obj.assistBy,
+    subFor: obj.subFor
+  }));
+}
+
+const FALLBACK_FIXTURES = [
+  {date:'2026-08-15',opponent:'Millbrook Athletic',homeAway:'H',competition:'League',kickoff:'15:00',homeScore:'',awayScore:''},
+  {date:'2026-08-22',opponent:'Kingswood Town',homeAway:'A',competition:'League',kickoff:'15:00',homeScore:'',awayScore:''},
+  {date:'2026-08-08',opponent:'Hartfield Rovers',homeAway:'H',competition:'League',kickoff:'',homeScore:'2',awayScore:'1'},
+  {date:'2026-08-01',opponent:'Sancroft City',homeAway:'A',competition:'Cup',kickoff:'',homeScore:'0',awayScore:'0'}
+];
+
+const RESULT_COLOR = { W: '#3ddc84', D: '#e8c547', L: '#ff4d5e' };
+
+class Component extends DCLogic {
+  state = { view: 'list', selectedDate: null, fixtures: null, events: null, loadError: null };
+
+  componentDidMount() {
+    if (SHEET_CSV_URL && SHEET_CSV_URL.indexOf('PASTE_YOUR') !== 0) {
+      const bustUrl = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+      fetch(bustUrl)
+        .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.text(); })
+        .then(csv => this.setState({ fixtures: parseFixturesCsv(csv), loadError: null }))
+        .catch(err => this.setState({ loadError: String(err && err.message || err) }));
+    }
+    if (MATCH_EVENTS_CSV_URL && MATCH_EVENTS_CSV_URL.indexOf('PASTE_YOUR') !== 0) {
+      const bustUrl = MATCH_EVENTS_CSV_URL + (MATCH_EVENTS_CSV_URL.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+      fetch(bustUrl)
+        .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.text(); })
+        .then(csv => this.setState({ events: parseMatchEventsCsv(csv) }))
+        .catch(() => this.setState({ events: [] }));
+    }
+  }
+
+  withDerived(f) {
+    const played = f.homeScore !== '' && f.homeScore != null && f.awayScore !== '' && f.awayScore != null;
+    const hs = played ? Number(f.homeScore) : null;
+    const as = played ? Number(f.awayScore) : null;
+    const ourScore = played ? (f.homeAway === 'H' ? hs : as) : null;
+    const theirScore = played ? (f.homeAway === 'H' ? as : hs) : null;
+    const result = played ? (ourScore > theirScore ? 'W' : ourScore < theirScore ? 'L' : 'D') : null;
+    const dateObj = new Date(f.date + 'T00:00:00');
+    const dateLabel = isNaN(dateObj.getTime())
+      ? f.date
+      : dateObj.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    return {
+      ...f,
+      played,
+      result,
+      resultColor: result ? RESULT_COLOR[result] : 'rgba(255,255,255,0.08)',
+      scoreLabel: played ? (ourScore + ' – ' + theirScore) : '',
+      venueLabel: f.homeAway === 'H' ? 'vs' : '@',
+      dateLabel,
+      sortKey: isNaN(dateObj.getTime()) ? f.date : dateObj.getTime()
+    };
+  }
+
+  renderVals() {
+    const { view, selectedDate, fixtures, events, loadError } = this.state;
+    const all = (fixtures || FALLBACK_FIXTURES).map(f => this.withDerived(f));
+
+    const upcoming = all.filter(f => !f.played).sort((a, b) => a.sortKey - b.sortKey);
+    const results = all.filter(f => f.played).sort((a, b) => b.sortKey - a.sortKey);
+
+    const sheetConfigured = !!SHEET_CSV_URL && SHEET_CSV_URL.indexOf('PASTE_YOUR') !== 0;
+    const dataStatus = loadError
+      ? 'Live fixtures failed to load — showing last known data'
+      : (sheetConfigured && !fixtures ? 'Loading live fixtures…' : '');
+
+    const match = selectedDate != null ? all.find(f => f.date === selectedDate) : null;
+    const matchEvents = (events || []).filter(e => e.date === selectedDate);
+    const byMinute = (a, b) => (Number(a.minute) || 0) - (Number(b.minute) || 0);
+    const starters = matchEvents.filter(e => e.type === 'Start');
+    const subs = matchEvents.filter(e => e.type === 'Sub').sort(byMinute);
+    const goals = matchEvents.filter(e => e.type === 'Goal').sort(byMinute)
+      .map(g => ({ ...g, hasAssist: !!(g.assistBy && g.assistBy.trim()) }));
+    const yellows = matchEvents.filter(e => e.type === 'Yellow').sort(byMinute);
+
+    return {
+      isList: view === 'list',
+      isMatch: view === 'match',
+      upcoming,
+      results,
+      hasUpcoming: upcoming.length > 0,
+      hasNoUpcoming: upcoming.length === 0,
+      hasResults: results.length > 0,
+      hasNoResults: results.length === 0,
+      dataStatus,
+      hasDataStatus: !!dataStatus,
+      match,
+      starters, subs, goals, yellows,
+      hasSubs: subs.length > 0,
+      hasGoals: goals.length > 0,
+      hasYellows: yellows.length > 0,
+      hasMatchDetail: matchEvents.length > 0,
+      hasNoMatchDetail: matchEvents.length === 0,
+      openMatch: (date) => this.setState({ view: 'match', selectedDate: date }),
+      backToList: () => this.setState({ view: 'list', selectedDate: null })
+    };
+  }
+}
+</script>
+</body>
+</html>
