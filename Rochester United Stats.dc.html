@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#0b0b0c;color:#f2f0ee;font-family:'Inter',sans-serif;}
+  a{color:#ff4d5e;}
+  a:hover{color:#ff7580;}
+  ::-webkit-scrollbar{height:8px;width:8px;}
+  ::-webkit-scrollbar-thumb{background:#c8102e;border-radius:4px;}
+</style>
+</helmet>
+<div style="min-height:100vh;background:radial-gradient(ellipse 900px 500px at 50% -10%, rgba(200,16,46,0.25), transparent 60%), #0b0b0c;">
+
+  <div style="position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:rgba(10,10,11,0.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.08);">
+    <div style="display:flex;align-items:center;gap:14px;cursor:pointer" onClick="{{ goHome }}">
+      <img src="./assets/badge.png" alt="Rochester United F.C. badge" style="width:40px;height:40px;object-fit:contain" />
+      <span style="font-family:'Oswald',sans-serif;font-weight:600;font-size:18px;letter-spacing:0.5px;text-transform:uppercase;">Rochester United <span style="color:#ff4d5e">F.C.</span></span>
+    </div>
+    <div style="font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1.5px;color:rgba(242,240,238,0.5);text-transform:uppercase;">2025/26 Season</div>
+  </div>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <div style="max-width:1200px;margin:0 auto;padding:56px 40px 80px;">
+
+      <div style="text-align:center;margin-bottom:56px;">
+        <img src="./assets/badge.png" alt="Rochester United F.C. badge" style="width:120px;height:120px;object-fit:contain;margin-bottom:20px;filter:drop-shadow(0 8px 24px rgba(200,16,46,0.35));" />
+        <h1 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:48px;letter-spacing:1px;text-transform:uppercase;margin:0 0 8px;">Season Stats</h1>
+        <p style="font-size:16px;color:rgba(242,240,238,0.55);margin:0;">Goals &middot; Assists &middot; Yellow Cards &middot; Minutes &middot; per-90 style averages for every player in the 24-man squad</p>
+        <sc-if value="{{ hasDataStatus }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:12px;letter-spacing:0.5px;color:#e8c547;margin:10px 0 0;">{{ dataStatus }}</p>
+        </sc-if>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:48px;">
+        <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-top:3px solid #c8102e;border-radius:10px;padding:22px 24px;cursor:pointer" onClick="{{ () => openPlayer(topScorer.id) }}">
+          <div style="font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#ff4d5e;margin-bottom:10px;">Top Scorer</div>
+          <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;margin-bottom:4px;">{{ topScorer.name }}</div>
+          <div style="font-size:14px;color:rgba(242,240,238,0.5);">{{ topScorer.goals }} goals</div>
+        </div>
+        <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-top:3px solid #c8102e;border-radius:10px;padding:22px 24px;cursor:pointer" onClick="{{ () => openPlayer(topAssists.id) }}">
+          <div style="font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#ff4d5e;margin-bottom:10px;">Top Assists</div>
+          <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;margin-bottom:4px;">{{ topAssists.name }}</div>
+          <div style="font-size:14px;color:rgba(242,240,238,0.5);">{{ topAssists.assists }} assists</div>
+        </div>
+        <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-top:3px solid #c8102e;border-radius:10px;padding:22px 24px;cursor:pointer" onClick="{{ () => openPlayer(mostMinutes.id) }}">
+          <div style="font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#ff4d5e;margin-bottom:10px;">Most Minutes</div>
+          <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;margin-bottom:4px;">{{ mostMinutes.name }}</div>
+          <div style="font-size:14px;color:rgba(242,240,238,0.5);">{{ mostMinutes.minutes }} mins</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+        <sc-for list="{{ positions }}" as="p" hint-placeholder-count="5">
+          <button style="font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.5px;text-transform:uppercase;padding:9px 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);cursor:pointer;background:{{ p.bg }};color:{{ p.color }};" onClick="{{ () => setPos(p.key) }}">{{ p.label }}</button>
+        </sc-for>
+      </div>
+
+      <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:820px;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+              <th style="text-align:left;padding:14px 20px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(242,240,238,0.45);cursor:pointer;" onClick="{{ () => sortBy('name') }}">Player{{ arrowName }}</th>
+              <th style="text-align:left;padding:14px 12px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(242,240,238,0.45);cursor:pointer;" onClick="{{ () => sortBy('pos') }}">Pos{{ arrowPos }}</th>
+              <th style="text-align:right;padding:14px 12px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(242,240,238,0.45);cursor:pointer;" onClick="{{ () => sortBy('goals') }}">Goals{{ arrowGoals }}</th>
+              <th style="text-align:right;padding:14px 12px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(242,240,238,0.45);cursor:pointer;" onClick="{{ () => sortBy('assists') }}">Assists{{ arrowAssists }}</th>
+              <th style="text-align:right;padding:14px 12px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(242,240,238,0.45);cursor:pointer;" onClick="{{ () => sortBy('yellow') }}">Yellows{{ arrowYellow }}</th>
+              <th style="text-align:right;padding:14px 12px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(242,240,238,0.45);cursor:pointer;" onClick="{{ () => sortBy('started') }}">Started{{ arrowStarted }}</th>
+              <th style="text-align:right;padding:14px 12px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(242,240,238,0.45);cursor:pointer;" onClick="{{ () => sortBy('minutes') }}">Mins{{ arrowMinutes }}</th>
+              <th style="text-align:right;padding:14px 12px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(242,240,238,0.45);cursor:pointer;" onClick="{{ () => sortBy('minPerGoal') }}">Min/Goal{{ arrowMinPerGoal }}</th>
+              <th style="text-align:right;padding:14px 12px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(242,240,238,0.45);cursor:pointer;" onClick="{{ () => sortBy('minPerAssist') }}">Min/Assist{{ arrowMinPerAssist }}</th>
+              <th style="text-align:right;padding:14px 20px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(242,240,238,0.45);cursor:pointer;" onClick="{{ () => sortBy('minPerGA') }}">Min/G+A{{ arrowMinPerGA }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ players }}" as="pl" hint-placeholder-count="24">
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;" style-hover="background:rgba(200,16,46,0.08)" onClick="{{ () => openPlayer(pl.id) }}">
+                <td style="padding:13px 20px;font-weight:600;">{{ pl.name }}</td>
+                <td style="padding:13px 12px;color:rgba(242,240,238,0.55);font-size:13px;">{{ pl.pos }}</td>
+                <td style="padding:13px 12px;text-align:right;font-variant-numeric:tabular-nums;">{{ pl.goals }}</td>
+                <td style="padding:13px 12px;text-align:right;font-variant-numeric:tabular-nums;">{{ pl.assists }}</td>
+                <td style="padding:13px 12px;text-align:right;font-variant-numeric:tabular-nums;">{{ pl.yellow }}</td>
+                <td style="padding:13px 12px;text-align:right;font-variant-numeric:tabular-nums;">{{ pl.started }}</td>
+                <td style="padding:13px 12px;text-align:right;font-variant-numeric:tabular-nums;">{{ pl.minutes }}</td>
+                <td style="padding:13px 12px;text-align:right;font-variant-numeric:tabular-nums;color:rgba(242,240,238,0.6);">{{ pl.minPerGoalLabel }}</td>
+                <td style="padding:13px 12px;text-align:right;font-variant-numeric:tabular-nums;color:rgba(242,240,238,0.6);">{{ pl.minPerAssistLabel }}</td>
+                <td style="padding:13px 20px;text-align:right;font-variant-numeric:tabular-nums;color:rgba(242,240,238,0.6);">{{ pl.minPerGALabel }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isPlayer }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:900px;margin:0 auto;padding:48px 40px 80px;">
+      <div style="margin-bottom:32px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.5px;text-transform:uppercase;color:#ff4d5e;" onClick="{{ goHome }}">&larr; All Players</div>
+
+      <div style="display:flex;align-items:center;gap:24px;margin-bottom:44px;">
+        <img src="./assets/badge.png" alt="Rochester United F.C. badge" style="width:64px;height:64px;object-fit:contain;" />
+        <div>
+          <h1 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:40px;text-transform:uppercase;margin:0 0 6px;">{{ selected.name }}</h1>
+          <span style="display:inline-block;background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.4);color:#ff4d5e;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:999px;">{{ selected.posFull }}</span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+        <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-top:3px solid #c8102e;border-radius:10px;padding:22px;">
+          <div style="font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(242,240,238,0.45);margin-bottom:10px;">Goals</div>
+          <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:32px;">{{ selected.goals }}</div>
+        </div>
+        <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-top:3px solid #c8102e;border-radius:10px;padding:22px;">
+          <div style="font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(242,240,238,0.45);margin-bottom:10px;">Assists</div>
+          <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:32px;">{{ selected.assists }}</div>
+        </div>
+        <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-top:3px solid #c8102e;border-radius:10px;padding:22px;">
+          <div style="font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(242,240,238,0.45);margin-bottom:10px;">Yellow Cards</div>
+          <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:32px;color:#e8c547;">{{ selected.yellow }}</div>
+        </div>
+        <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-top:3px solid #c8102e;border-radius:10px;padding:22px;">
+          <div style="font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(242,240,238,0.45);margin-bottom:10px;">Minutes</div>
+          <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:32px;">{{ selected.minutes }}</div>
+        </div>
+        <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-top:3px solid #c8102e;border-radius:10px;padding:22px;">
+          <div style="font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(242,240,238,0.45);margin-bottom:10px;">Games Started</div>
+          <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:32px;">{{ selected.started }}</div>
+        </div>
+        <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:22px;">
+          <div style="font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(242,240,238,0.45);margin-bottom:10px;">Mins / Goal</div>
+          <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:32px;">{{ selected.minPerGoalLabel }}</div>
+        </div>
+        <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:22px;">
+          <div style="font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(242,240,238,0.45);margin-bottom:10px;">Mins / Assist</div>
+          <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:32px;">{{ selected.minPerAssistLabel }}</div>
+        </div>
+        <div style="background:#161617;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:22px;grid-column:span 2;">
+          <div style="font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(242,240,238,0.45);margin-bottom:10px;">Mins / Goal or Assist</div>
+          <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:32px;">{{ selected.minPerGALabel }}</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+// Live stats are pulled from a published Google Sheet (File > Share > Publish to web > CSV).
+// Paste that CSV link here. Until you do, the page falls back to the data below.
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyXeTqEonb8G00urO0jcG8kBJOpby-HAB3m-0g5o5owG99cwhNDJzkpLKogrJCx2Intx_HS_T1JdSQ/pub?gid=0&single=true&output=csv';
+
+// Sheet columns (exact header names, one row per player). "id" is optional —
+// rows are numbered by their order in the sheet if it's left blank:
+// id, name, pos, posFull, goals, assists, yellow, minutes, started
+function parseRosterCsv(text) {
+  const rows = text.trim().split(/\r?\n/).map(line => {
+    const cells = [];
+    let cur = '', inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (inQuotes) {
+        if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else inQuotes = false; }
+        else cur += c;
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ',') { cells.push(cur); cur = ''; }
+        else cur += c;
+      }
+    }
+    cells.push(cur);
+    return cells;
+  });
+  const header = rows[0].map(h => h.trim());
+  return rows.slice(1)
+    .filter(r => r.some(c => c.trim() !== ''))
+    .map((r, i) => {
+      const obj = {};
+      header.forEach((h, i) => { obj[h] = (r[i] ?? '').trim(); });
+      return {
+        id: obj.id && Number(obj.id) ? Number(obj.id) : i + 1,
+        name: obj.name,
+        pos: obj.pos,
+        posFull: obj.posFull,
+        goals: Number(obj.goals) || 0,
+        assists: Number(obj.assists) || 0,
+        yellow: Number(obj.yellow) || 0,
+        minutes: Number(obj.minutes) || 0,
+        started: Number(obj.started) || 0
+      };
+    });
+}
+
+const FALLBACK_PLAYERS = [
+  {id:1,name:'Chris Swift',pos:'GK',posFull:'Goalkeeper',goals:0,assists:0,yellow:1,minutes:3060,started:34},
+  {id:2,name:'Jack Reeves',pos:'GK',posFull:'Goalkeeper',goals:0,assists:0,yellow:0,minutes:540,started:6},
+  {id:3,name:'Tommy Kemp',pos:'GK',posFull:'Goalkeeper',goals:0,assists:0,yellow:0,minutes:90,started:1},
+  {id:4,name:'Ben Wyness',pos:'DEF',posFull:'Defender',goals:2,assists:1,yellow:6,minutes:2880,started:32},
+  {id:5,name:'Jack Bray',pos:'DEF',posFull:'Defender',goals:1,assists:0,yellow:8,minutes:2700,started:30},
+  {id:6,name:'Tony Whittaker',pos:'DEF',posFull:'Defender',goals:0,assists:4,yellow:5,minutes:2520,started:28},
+  {id:7,name:'Will Currie',pos:'DEF',posFull:'Defender',goals:1,assists:3,yellow:4,minutes:2340,started:26},
+  {id:8,name:'Tom Webb',pos:'DEF',posFull:'Defender',goals:3,assists:0,yellow:7,minutes:1980,started:22},
+  {id:9,name:'Dan Lott',pos:'DEF',posFull:'Defender',goals:0,assists:2,yellow:3,minutes:1620,started:18},
+  {id:10,name:'Tom Loynes',pos:'DEF',posFull:'Defender',goals:0,assists:1,yellow:2,minutes:900,started:10},
+  {id:11,name:'Lucas Payne',pos:'MID',posFull:'Midfielder',goals:6,assists:8,yellow:5,minutes:2970,started:33},
+  {id:12,name:'Conno Watson',pos:'MID',posFull:'Midfielder',goals:4,assists:6,yellow:6,minutes:2880,started:32},
+  {id:13,name:'Liam Wilkins',pos:'MID',posFull:'Midfielder',goals:9,assists:7,yellow:3,minutes:2610,started:29},
+  {id:14,name:'Harvey Brown',pos:'MID',posFull:'Midfielder',goals:3,assists:5,yellow:4,minutes:2340,started:26},
+  {id:15,name:'Harvey Roberts',pos:'MID',posFull:'Midfielder',goals:1,assists:3,yellow:9,minutes:2790,started:31},
+  {id:16,name:'Logan Thompson',pos:'MID',posFull:'Midfielder',goals:5,assists:4,yellow:2,minutes:2160,started:24},
+  {id:17,name:'Kevin Dance',pos:'MID',posFull:'Midfielder',goals:4,assists:6,yellow:3,minutes:1890,started:21},
+  {id:18,name:'Hicham Akhazzan',pos:'MID',posFull:'Midfielder',goals:7,assists:5,yellow:1,minutes:1710,started:19},
+  {id:19,name:'Bobby Parker',pos:'MID',posFull:'Midfielder',goals:2,assists:3,yellow:4,minutes:1440,started:16},
+  {id:20,name:'Max Cutler',pos:'MID',posFull:'Midfielder',goals:1,assists:2,yellow:2,minutes:990,started:11},
+  {id:21,name:'Harry Sheridan',pos:'MID',posFull:'Midfielder',goals:2,assists:1,yellow:1,minutes:720,started:8},
+  {id:22,name:'Mack Reilly',pos:'FWD',posFull:'Forward',goals:22,assists:6,yellow:3,minutes:2880,started:32},
+  {id:23,name:'Aston Freeman',pos:'FWD',posFull:'Forward',goals:15,assists:4,yellow:2,minutes:2340,started:26},
+  {id:24,name:'Max Morgan',pos:'FWD',posFull:'Forward',goals:11,assists:3,yellow:1,minutes:1620,started:18}
+];
+
+const POS_LABELS = {ALL:'All Players',GK:'Goalkeepers',DEF:'Defenders',MID:'Midfielders',FWD:'Forwards'};
+
+class Component extends DCLogic {
+  state = { view: 'home', playerId: null, sortKey: 'goals', sortDir: 'desc', posFilter: 'ALL', players: null, loadError: null };
+
+  componentDidMount() {
+    if (!SHEET_CSV_URL || SHEET_CSV_URL.indexOf('PASTE_YOUR') === 0) return;
+    const bustUrl = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+    fetch(bustUrl)
+      .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.text(); })
+      .then(csv => this.setState({ players: parseRosterCsv(csv), loadError: null }))
+      .catch(err => this.setState({ loadError: String(err && err.message || err) }));
+  }
+
+  withDerived(p) {
+    const ga = p.goals + p.assists;
+    return {
+      ...p,
+      minPerGoal: p.goals ? Math.round(p.minutes / p.goals) : null,
+      minPerAssist: p.assists ? Math.round(p.minutes / p.assists) : null,
+      minPerGA: ga ? Math.round(p.minutes / ga) : null,
+      minPerGoalLabel: p.goals ? String(Math.round(p.minutes / p.goals)) : '–',
+      minPerAssistLabel: p.assists ? String(Math.round(p.minutes / p.assists)) : '–',
+      minPerGALabel: ga ? String(Math.round(p.minutes / ga)) : '–'
+    };
+  }
+
+  renderVals() {
+    const { view, playerId, sortKey, sortDir, posFilter, players, loadError } = this.state;
+    const all = (players || FALLBACK_PLAYERS).map(p => this.withDerived(p));
+
+    const topScorer = all.reduce((a, b) => (b.goals > a.goals ? b : a));
+    const topAssists = all.reduce((a, b) => (b.assists > a.assists ? b : a));
+    const mostMinutes = all.reduce((a, b) => (b.minutes > a.minutes ? b : a));
+
+    const filtered = posFilter === 'ALL' ? all : all.filter(p => p.pos === posFilter);
+    const dir = sortDir === 'asc' ? 1 : -1;
+    const sorted = [...filtered].sort((a, b) => {
+      const av = a[sortKey], bv = b[sortKey];
+      if (av === null && bv === null) return 0;
+      if (av === null) return 1;
+      if (bv === null) return -1;
+      if (typeof av === 'string') return av.localeCompare(bv) * dir;
+      return (av - bv) * dir;
+    });
+
+    const positions = ['ALL', 'GK', 'DEF', 'MID', 'FWD'].map(key => ({
+      key,
+      label: POS_LABELS[key],
+      bg: posFilter === key ? '#c8102e' : 'transparent',
+      color: posFilter === key ? '#fff' : 'rgba(242,240,238,0.7)'
+    }));
+
+    const arrow = (key) => (sortKey === key ? (sortDir === 'asc' ? ' ↑' : ' ↓') : '');
+
+    const selected = playerId != null ? all.find(p => p.id === playerId) : null;
+
+    const sheetConfigured = !!SHEET_CSV_URL && SHEET_CSV_URL.indexOf('PASTE_YOUR') !== 0;
+    const dataStatus = loadError
+      ? 'Live stats failed to load — showing last known data'
+      : (sheetConfigured && !players ? 'Loading live stats…' : '');
+
+    return {
+      isHome: view === 'home',
+      isPlayer: view === 'player',
+      players: sorted,
+      positions,
+      topScorer, topAssists, mostMinutes,
+      selected,
+      dataStatus,
+      hasDataStatus: !!dataStatus,
+      arrowName: arrow('name'), arrowPos: arrow('pos'), arrowGoals: arrow('goals'),
+      arrowAssists: arrow('assists'), arrowYellow: arrow('yellow'), arrowMinutes: arrow('minutes'),
+      arrowMinPerGoal: arrow('minPerGoal'), arrowMinPerAssist: arrow('minPerAssist'), arrowMinPerGA: arrow('minPerGA'),
+      arrowStarted: arrow('started'),
+      setPos: (key) => this.setState({ posFilter: key }),
+      sortBy: (key) => this.setState(s => ({ sortKey: key, sortDir: s.sortKey === key && s.sortDir === 'desc' ? 'asc' : 'desc' })),
+      openPlayer: (id) => this.setState({ view: 'player', playerId: id }),
+      goHome: () => this.setState({ view: 'home', playerId: null })
+    };
+  }
+}
+</script>
+</body>
+</html>
